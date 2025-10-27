@@ -204,8 +204,8 @@
                             <i class="fas fa-shield-alt"></i>
                         </div>
                         <div>
-                            <h4 style="font-weight: 700; margin-bottom: 0.3rem;">حماية متقدمة</h4>
-                            <p style="opacity: 0.9; font-size: 0.95rem;">أمان عالي لبياناتك ومعلوماتك</p>
+                            <h4 style="font-weight: 700; margin-bottom: 0.3rem;">أمان متقدم</h4>
+                            <p style="opacity: 0.9; font-size: 0.95rem;">حماية كاملة لبياناتك ومعلوماتك</p>
                         </div>
                     </div>
                 </div>
@@ -213,7 +213,7 @@
                 <!-- Right Side - Registration Form -->
                 <div class="form-section">
                     <h2 style="font-size: 2rem; font-weight: bold; margin-bottom: 0.5rem; color: #333;">إنشاء حساب جديد</h2>
-                    <p style="color: #666; margin-bottom: 2rem;">انضم إلينا وابدأ رحلتك مع كاش برو</p>
+                    <p style="color: #666; margin-bottom: 2rem;">انضم إلينا وابدأ إدارة عملك بكفاءة</p>
                     
                     <form id="registerForm">
                         <div class="form-group">
@@ -232,43 +232,35 @@
                             <input type="tel" id="phone" placeholder="07XXXXXXXXX" required>
                         </div>
                         
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                            <div class="form-group">
-                                <label for="country">
-                                    <i class="fas fa-globe" style="margin-left: 0.5rem; color: #667eea;"></i>
-                                    البلد
-                                </label>
-                                <select id="country" required>
-                                    <option value="العراق">العراق</option>
-                                    <option value="مصر">مصر</option>
-                                    <option value="السعودية">السعودية</option>
-                                    <option value="الأردن">الأردن</option>
-                                    <option value="لبنان">لبنان</option>
-                                    <option value="سوريا">سوريا</option>
-                                    <option value="اليمن">اليمن</option>
-                                    <option value="الإمارات">الإمارات</option>
-                                    <option value="قطر">قطر</option>
-                                    <option value="الكويت">الكويت</option>
-                                    <option value="البحرين">البحرين</option>
-                                    <option value="عمان">عمان</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="city">
-                                    <i class="fas fa-map-marker-alt" style="margin-left: 0.5rem; color: #667eea;"></i>
-                                    المدينة
-                                </label>
-                                <input type="text" id="city" placeholder="مدينتك" required>
-                            </div>
+                        <div class="form-group">
+                            <label for="country">
+                                <i class="fas fa-flag" style="margin-left: 0.5rem; color: #667eea;"></i>
+                                الدولة
+                            </label>
+                            <select id="country" required>
+                                <option value="">اختر الدولة</option>
+                                <option value="العراق" selected>العراق</option>
+                                <option value="مصر">مصر</option>
+                                <option value="السعودية">السعودية</option>
+                                <option value="الأردن">الأردن</option>
+                                <option value="الإمارات">الإمارات</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="city">
+                                <i class="fas fa-city" style="margin-left: 0.5rem; color: #667eea;"></i>
+                                المدينة
+                            </label>
+                            <input type="text" id="city" placeholder="اسم المدينة" required>
                         </div>
                         
                         <div class="form-group">
                             <label for="street">
-                                <i class="fas fa-road" style="margin-left: 0.5rem; color: #667eea;"></i>
-                                الشارع / العنوان
+                                <i class="fas fa-map-marker-alt" style="margin-left: 0.5rem; color: #667eea;"></i>
+                                الحي / الشارع
                             </label>
-                            <input type="text" id="street" placeholder="عنوانك بالتفصيل" required>
+                            <input type="text" id="street" placeholder="الحي أو الشارع" required>
                         </div>
                         
                         <div class="code-input-section" id="codeSection" style="display: none;">
@@ -369,7 +361,7 @@
                 
                 // Determine subscription type
                 let subscriptionType = selectedPlan;
-                let subscriptionStatus = 'free';
+                let subscriptionStatus = selectedPlan === 'free' ? 'active' : 'free';
                 let subscriptionEnd = Date.now() + (30 * 24 * 60 * 60 * 1000); // 30 days for free
                 
                 // Check subscription code for paid plans
@@ -434,19 +426,31 @@
                         daysLeft: Math.ceil((subscriptionEnd - Date.now()) / (1000 * 60 * 60 * 24))
                     },
                     createdAt: Date.now(),
-                    lastLogin: Date.now()
+                    lastLogin: Date.now(),
+                    products: [],
+                    invoices: []
                 };
                 
                 // Save to Firebase
                 await database.ref('users/' + userId).set(userData);
                 
-                // Save to localStorage
+                // Save to localStorage - CRITICAL: حفظ جميع البيانات المطلوبة
                 localStorage.setItem('userId', userId);
                 localStorage.setItem('userName', name);
-                saveSubscriptionToLocal(userData.subscription); // استخدم الدالة الموحدة
+                localStorage.setItem('userPhone', phone);
+                localStorage.setItem('userCountry', country);
+                localStorage.setItem('userCity', city);
+                localStorage.setItem('userStreet', street);
+                
+                // حفظ بيانات الاشتراك
+                saveSubscriptionToLocal(userData.subscription);
+                
+                // حفظ علم أن المستخدم مسجل
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('onboarded', '1');
                 
                 // Success
-                Swal.fire({
+                await Swal.fire({
                     icon: 'success',
                     title: 'مرحباً بك!',
                     html: `تم إنشاء حسابك بنجاح<br><strong>${name}</strong><br>جاري الانتقال إلى التطبيق...`,
@@ -455,9 +459,8 @@
                     confirmButtonColor: '#667eea'
                 });
                 
-                setTimeout(() => {
-                    window.location.href = 'app.html';
-                }, 2000);
+                // إعادة التوجيه إلى التطبيق
+                window.location.href = 'app.html';
                 
             } catch (error) {
                 console.error('Error:', error);

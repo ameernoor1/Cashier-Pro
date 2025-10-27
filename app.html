@@ -1088,13 +1088,159 @@
     function openModal(id){ document.getElementById(id).classList.remove('hidden'); }
     function closeModal(id){ document.getElementById(id).classList.add('hidden'); }
 
-    // 6) التهيئة
+    // 6) التهيئة المحدثة - دعم نظام userId الجديد
     window.addEventListener('DOMContentLoaded', () => {
-        getOrCreateDeviceId();
-        maybeShowWelcome();
-        if (!checkSubscription()) return; // منع تحميل النظام إذا الاشتراك غير نشط
-        initSystem();
+        // التحقق من وجود مستخدم مسجل من نظام register.html الجديد
+        const userId = localStorage.getItem('userId');
+        const isLoggedIn = localStorage.getItem('isLoggedIn');
+        const userName = localStorage.getItem('userName');
+        
+        if (userId && isLoggedIn === 'true' && userName) {
+            // المستخدم مسجل من خلال نظام register.html الجديد
+            console.log('User logged in via new system:', userId);
+            
+            // تحميل بيانات المستخدم من Firebase
+            loadUserDataFromFirebase(userId).then(() => {
+                // التحقق من الاشتراك
+                if (!checkSubscriptionNew()) {
+                    // الاشتراك منتهي أو غير نشط
+                    return;
+                }
+                // تحميل النظام
+                initSystem();
+            }).catch(error => {
+                console.error('Error loading user data:', error);
+                // في حالة الخطأ، استخدم النظام القديم
+                getOrCreateDeviceId();
+                maybeShowWelcome();
+                if (!checkSubscription()) return;
+                initSystem();
+            });
+        } else {
+            // استخدام النظام القديم
+            getOrCreateDeviceId();
+            maybeShowWelcome();
+            if (!checkSubscription()) return;
+            initSystem();
+        }
     });
+    
+    // دالة تحميل بيانات المستخدم من Firebase
+    async function loadUserDataFromFirebase(userId) {
+        try {
+            const userSnapshot = await db.ref('users/' + userId).once('value');
+            const userData = userSnapshot.val();
+            
+            if (userData) {
+                // تحديث lastLogin
+                await db.ref('users/' + userId + '/lastLogin').set(Date.now());
+                
+                // حفظ بيانات الاشتراك محلياً
+                if (userData.subscription) {
+                    saveSubscriptionToLocal(userData.subscription);
+                }
+                
+                // تحميل المنتجات والفواتير إذا كانت موجودة
+                if (userData.products && userData.products.length > 0) {
+                    localStorage.setItem('cashierProducts', JSON.stringify(userData.products));
+                }
+                
+                if (userData.invoices && userData.invoices.length > 0) {
+                    localStorage.setItem('cashierInvoices', JSON.stringify(userData.invoices));
+                }
+                
+                console.log('User data loaded successfully');
+            }
+        } catch (error) {
+            console.error('Error loading user data from Firebase:', error);
+            throw error;
+        }
+    }
+    
+    // دالة التحقق من الاشتراك للنظام الجديد
+    function checkSubscriptionNew() {
+        const subscription = checkSubscriptionStatus();
+        
+        if (!subscription.active) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'انتهى الاشتراك',
+                html: 'اشتراكك منتهي أو غير نشط<br>الرجاء تجديد الاشتراك للاستمرار',
+                confirmButtonColor: '#667eea',
+                showCancelButton: true,
+                confirmButtonText: 'تجديد الاشتراك',
+                cancelButtonText: 'إلغاء'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = 'landing.html';
+                }
+            });
+            return false;
+        }
+        
+        // تحديث واجهة الاشتراك
+        updateSubscriptionUI(subscription);
+        return true;
+    }
+    
+    // دالة تحديث واجهة الاشتراك
+    function updateSubscriptionUI(subscription) {
+        // تحديث حالة الاشتراك في الهيدر
+        const statusElements = document.querySelectorAll('#subscriptionStatus');
+        statusElements.forEach(el => {
+            if (el) el.textContent = subscription.status === 'active' ? 'نشط' : 'غير نشط';
+        });
+        
+        // تحديث الأيام المتبقية
+        const daysElements = document.querySelectorAll('#subscriptionDays');
+        daysElements.forEach(el => {
+            if (el) el.textContent = subscription.daysLeft + ' يوم متبقي';
+        });
+        
+        // تحديث صفحة الإعدادات
+        const subStatusEl = document.getElementById('subStatus');
+        if (subStatusEl) {
+            subStatusEl.textContent = subscription.status === 'active' ? 'نشط' : 'غير نشط';
+        }
+        
+        const expiryDateEl = document.getElementById('expiryDate');
+        if (expiryDateEl && subscription.end) {
+            expiryDateEl.textContent = new Date(subscription.end).toLocaleDateString('ar-IQ');
+        }
+        
+        const userIdEl = document.getElementById('userId');
+        if (userIdEl) {
+            const userId = localStorage.getItem('userId');
+            userIdEl.textContent = userId || 'غير معرف';
+        }
+    }
+    
+    // دالة حفظ بيانات الاشتراك من firebase-config.js
+    function saveSubscriptionToLocal(subscription) {
+        localStorage.setItem('subscriptionData', JSON.stringify(subscription));
+    }
+    
+    // دالة التحقق من حالة الاشتراك من firebase-config.js
+    function checkSubscriptionStatus() {
+        const userId = localStorage.getItem('userId');
+        if (!userId) return { active: false, type: 'none', daysLeft: 0 };
+
+        const subscriptionData = JSON.parse(localStorage.getItem('subscriptionData') || '{}');
+        if (!subscriptionData.type) return { active: false, type: 'none', daysLeft: 0 };
+
+        const now = Date.now();
+        const endDate = Number(subscriptionData.end) || 0;
+        const daysLeft = Math.max(0, Math.ceil((endDate - now) / (1000 * 60 * 60 * 24)));
+        const active = subscriptionData.status === 'active' && endDate > now;
+        return {
+            active,
+            type: subscriptionData.type,
+            daysLeft,
+            status: subscriptionData.status,
+            end: endDate,
+            start: Number(subscriptionData.start) || 0
+        };
+    }
 </script>
 
 <!-- Welcome Modal -->
@@ -1182,6 +1328,36 @@
                 printerSettings: getPrinterSettings(),
                 autoBackup: document.getElementById('autoBackup')?.value || 'none'
             }));
+            
+            // حفظ البيانات أيضاً في Firebase إذا كان المستخدم مسجلاً
+            const userId = localStorage.getItem('userId');
+            if (userId) {
+                saveToFirebase(userId);
+            }
+        }
+        
+        // دالة حفظ البيانات إلى Firebase
+        function saveToFirebase(userId) {
+            if (!userId) return;
+            
+            try {
+                // حفظ المنتجات
+                if (products && products.length > 0) {
+                    db.ref('users/' + userId + '/products').set(products);
+                }
+                
+                // حفظ الفواتير
+                if (invoices && invoices.length > 0) {
+                    db.ref('users/' + userId + '/invoices').set(invoices);
+                }
+                
+                // تحديث lastUpdate
+                db.ref('users/' + userId + '/lastUpdate').set(Date.now());
+                
+                console.log('Data saved to Firebase successfully');
+            } catch (error) {
+                console.error('Error saving to Firebase:', error);
+            }
         }
         
         function loadFromLocalStorage() {
@@ -2450,40 +2626,8 @@
         }
         
         function checkSubscription() {
-            // تحقق من حالة الاشتراك من localStorage
-            const subscription = checkSubscriptionStatus();
-            if (!subscription.active) {
-                // إذا لم يكن الاشتراك نشطًا، أظهر رسالة أو أعد توجيه المستخدم
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'انتهى الاشتراك أو غير نشط',
-                    text: 'يرجى تفعيل الاشتراك أو التواصل مع الدعم',
-                    confirmButtonColor: '#667eea',
-                    showCancelButton: true,
-                    confirmButtonText: 'صفحة التسجيل',
-                    cancelButtonText: 'إلغاء'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = 'register.html';
-                    }
-                });
-                // منع تحميل باقي النظام
-                return false;
-            }
-            // تحديث واجهة الاشتراك
-            document.getElementById('subscriptionStatus').textContent = subscription.status === 'active' ? 'نشط' : 'غير نشط';
-            document.getElementById('subscriptionDays').textContent = subscription.daysLeft + ' يوم متبقي';
-            // تحديث معلومات الاشتراك في صفحة الإعدادات إذا وجدت
-            if (document.getElementById('subStatus')) {
-                document.getElementById('subStatus').textContent = subscription.status === 'active' ? 'نشط' : 'غير نشط';
-            }
-            if (document.getElementById('expiryDate')) {
-                document.getElementById('expiryDate').textContent = subscription.end ? new Date(subscription.end).toLocaleDateString('ar-IQ') : '-';
-            }
-            if (document.getElementById('userId')) {
-                document.getElementById('userId').textContent = localStorage.getItem('userId') || 'غير معرف';
-            }
-            return true;
+            // استخدام النظام الجديد
+            return checkSubscriptionNew();
         }
         
         // Utility Functions
