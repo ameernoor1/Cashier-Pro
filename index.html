@@ -1,10 +1,172 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-  <meta http-equiv="refresh" content="0; url=landing.html">
-  <title>Cashier Pro</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>كاش برو - نظام الكاشير الاحترافي</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
+        * { font-family: 'Cairo', sans-serif; }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 30px;
+            padding: 3rem;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 15px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            font-size: 1.1rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-info {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .divider {
+            height: 2px;
+            background: linear-gradient(to right, transparent, #e5e7eb, transparent);
+            margin: 2rem 0;
+        }
+    </style>
 </head>
 <body>
-  إذا لم يتم تحويلك تلقائيًا، <a href="landing.html">اضغط هنا</a>.
+    <div class="card">
+        <div style="font-size: 4rem; margin-bottom: 1rem;">💰</div>
+        <h1 style="font-size: 2.5rem; font-weight: 900; color: #333; margin-bottom: 0.5rem;">
+            كاش برو
+        </h1>
+        <p style="color: #666; font-size: 1.2rem; margin-bottom: 2rem;">
+            نظام الكاشير الاحترافي الأول في العراق
+        </p>
+        
+        <div class="divider"></div>
+        
+        <h2 style="font-size: 1.5rem; font-weight: bold; color: #333; margin-bottom: 1.5rem;">
+            اختر وجهتك:
+        </h2>
+        
+        <a href="landing.html" class="btn btn-primary">
+            <i class="fas fa-home"></i>
+            الصفحة الرئيسية
+        </a>
+        
+        <a href="register.html?plan=free" class="btn btn-success">
+            <i class="fas fa-user-plus"></i>
+            إنشاء حساب جديد
+        </a>
+        
+        <a href="app.html" class="btn btn-info">
+            <i class="fas fa-cash-register"></i>
+            فتح نظام الكاشير
+        </a>
+        
+        <a href="admin.html" class="btn btn-warning">
+            <i class="fas fa-crown"></i>
+            لوحة الإدارة
+        </a>
+        
+        <div class="divider"></div>
+        
+        <h2 style="font-size: 1.3rem; font-weight: bold; color: #ef4444; margin-bottom: 1rem;">
+            <i class="fas fa-exclamation-triangle"></i>
+            هل تواجه مشكلة؟
+        </h2>
+        
+        <a href="تشخيص.html" class="btn" style="background: #8b5cf6; color: white;">
+            <i class="fas fa-stethoscope"></i>
+            صفحة التشخيص
+        </a>
+        
+        <a href="دليل_الحل.html" class="btn" style="background: #ec4899; color: white;">
+            <i class="fas fa-book-medical"></i>
+            دليل حل المشاكل
+        </a>
+        
+        <div class="divider"></div>
+        
+        <div style="margin-top: 2rem; padding: 1.5rem; background: #f9fafb; border-radius: 15px;">
+            <h3 style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">
+                📚 المستندات
+            </h3>
+            <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem; flex-wrap: wrap;">
+                <a href="README.md" style="color: #667eea; text-decoration: none; font-weight: 600;">
+                    <i class="fas fa-file-alt"></i> README
+                </a>
+                <a href="تقرير_الإصلاحات.html" style="color: #667eea; text-decoration: none; font-weight: 600;">
+                    <i class="fas fa-file-alt"></i> تقرير الإصلاحات
+                </a>
+            </div>
+        </div>
+        
+        <div style="margin-top: 2rem; color: #666; font-size: 0.9rem;">
+            <p>© 2025 كاش برو. جميع الحقوق محفوظة.</p>
+            <p style="margin-top: 0.5rem;">الإصدار 2.0 - محدّث</p>
+        </div>
+    </div>
+    
+    <script>
+        // التحقق التلقائي من تسجيل الدخول
+        window.addEventListener('load', function() {
+            const userId = localStorage.getItem('userId');
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            
+            if (userId && isLoggedIn === 'true') {
+                console.log('✅ User is logged in:', userId);
+                console.log('💡 You can go directly to app.html');
+            } else {
+                console.log('ℹ️ No user logged in');
+                console.log('💡 Please register or go to landing page');
+            }
+        });
+    </script>
 </body>
 </html>

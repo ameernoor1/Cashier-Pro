@@ -1090,34 +1090,45 @@
 
     // 6) التهيئة المحدثة - دعم نظام userId الجديد
     window.addEventListener('DOMContentLoaded', () => {
+        console.log('🚀 App Loading...');
+        
         // التحقق من وجود مستخدم مسجل من نظام register.html الجديد
         const userId = localStorage.getItem('userId');
         const isLoggedIn = localStorage.getItem('isLoggedIn');
         const userName = localStorage.getItem('userName');
         
+        console.log('User ID:', userId);
+        console.log('Is Logged In:', isLoggedIn);
+        console.log('User Name:', userName);
+        
         if (userId && isLoggedIn === 'true' && userName) {
             // المستخدم مسجل من خلال نظام register.html الجديد
-            console.log('User logged in via new system:', userId);
+            console.log('✅ User logged in via new system:', userId);
             
             // تحميل بيانات المستخدم من Firebase
             loadUserDataFromFirebase(userId).then(() => {
+                console.log('✅ User data loaded from Firebase');
                 // التحقق من الاشتراك
                 if (!checkSubscriptionNew()) {
                     // الاشتراك منتهي أو غير نشط
+                    console.warn('⚠️ Subscription inactive');
                     return;
                 }
+                console.log('✅ Subscription active, initializing system...');
                 // تحميل النظام
                 initSystem();
             }).catch(error => {
-                console.error('Error loading user data:', error);
+                console.error('❌ Error loading user data:', error);
                 // في حالة الخطأ، استخدم النظام القديم
+                console.log('⚠️ Falling back to old system...');
                 getOrCreateDeviceId();
-                maybeShowWelcome();
+                // لا تعرض نافذة الترحيب للمستخدمين المسجلين
                 if (!checkSubscription()) return;
                 initSystem();
             });
         } else {
             // استخدام النظام القديم
+            console.log('ℹ️ Using old system (deviceId)');
             getOrCreateDeviceId();
             maybeShowWelcome();
             if (!checkSubscription()) return;
@@ -1161,7 +1172,11 @@
     function checkSubscriptionNew() {
         const subscription = checkSubscriptionStatus();
         
+        console.log('📊 Checking subscription:', subscription);
+        
         if (!subscription.active) {
+            console.warn('⚠️ Subscription is not active!');
+            
             Swal.fire({
                 icon: 'warning',
                 title: 'انتهى الاشتراك',
@@ -1177,6 +1192,8 @@
             });
             return false;
         }
+        
+        console.log('✅ Subscription is active:', subscription.daysLeft, 'days left');
         
         // تحديث واجهة الاشتراك
         updateSubscriptionUI(subscription);
@@ -1223,16 +1240,27 @@
     // دالة التحقق من حالة الاشتراك من firebase-config.js
     function checkSubscriptionStatus() {
         const userId = localStorage.getItem('userId');
-        if (!userId) return { active: false, type: 'none', daysLeft: 0 };
+        console.log('🔍 Checking subscription for userId:', userId);
+        
+        if (!userId) {
+            console.warn('⚠️ No userId found');
+            return { active: false, type: 'none', daysLeft: 0 };
+        }
 
         const subscriptionData = JSON.parse(localStorage.getItem('subscriptionData') || '{}');
-        if (!subscriptionData.type) return { active: false, type: 'none', daysLeft: 0 };
+        console.log('📦 Subscription data from localStorage:', subscriptionData);
+        
+        if (!subscriptionData.type) {
+            console.warn('⚠️ No subscription type found');
+            return { active: false, type: 'none', daysLeft: 0 };
+        }
 
         const now = Date.now();
         const endDate = Number(subscriptionData.end) || 0;
         const daysLeft = Math.max(0, Math.ceil((endDate - now) / (1000 * 60 * 60 * 24)));
         const active = subscriptionData.status === 'active' && endDate > now;
-        return {
+        
+        const result = {
             active,
             type: subscriptionData.type,
             daysLeft,
@@ -1240,6 +1268,9 @@
             end: endDate,
             start: Number(subscriptionData.start) || 0
         };
+        
+        console.log('📊 Subscription status result:', result);
+        return result;
     }
 </script>
 
