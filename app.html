@@ -964,7 +964,40 @@
     </div>
     
     <!-- Firebase SDKs -->
-<!-- تم حذف تهيئة Firebase المكررة، التهيئة تتم فقط في firebase-config.js -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script>
+    // نفس firebaseConfig من لوحة الإدارة
+    const firebaseConfig = {
+        apiKey: "AIzaSyB9veHRWl-DZn1o8QWB-iCMrZdzTCVQRaA",
+        authDomain: "data-sayed-hussein-al-saadari.firebaseapp.com",
+        databaseURL: "https://data-sayed-hussein-al-saadari-default-rtdb.firebaseio.com",
+        projectId: "data-sayed-hussein-al-saadari",
+        storageBucket: "data-sayed-hussein-al-saadari.firebasestorage.app",
+        messagingSenderId: "360870345361",
+        appId: "1:360870345361:web:b6098fc1cf33d15b04dd30"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // 1) جهاز/هوية محلية
+    function getOrCreateDeviceId() {
+        let id = localStorage.getItem('deviceId');
+        if (!id) {
+            id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+            localStorage.setItem('deviceId', id);
+        }
+        return id;
+    }
+
+    // 2) إظهار الترحيب لأول مرة
+    function maybeShowWelcome() {
+        if (localStorage.getItem('onboarded') === '1') return;
+        document.getElementById('welcomeModal').classList.remove('hidden');
+    }
+
+    // 3) حفظ تسجيل المستخدم
+    async function submitRegistration() {
         const name    = document.getElementById('regName').value.trim();
         const phone   = document.getElementById('regPhone').value.trim();
         const country = document.getElementById('regCountry').value.trim();
@@ -1059,7 +1092,7 @@
     window.addEventListener('DOMContentLoaded', () => {
         getOrCreateDeviceId();
         maybeShowWelcome();
-        // ...existing code...
+        if (!checkSubscription()) return; // منع تحميل النظام إذا الاشتراك غير نشط
         initSystem();
     });
 </script>
@@ -2417,59 +2450,40 @@
         }
         
         function checkSubscription() {
-            const subscriptionEnd = localStorage.getItem('subscriptionEnd');
-            if (!subscriptionEnd) {
-                // Set trial period (30 days)
-                const trialEnd = new Date();
-                trialEnd.setDate(trialEnd.getDate() + 30);
-                localStorage.setItem('subscriptionEnd', trialEnd.toISOString());
+            // تحقق من حالة الاشتراك من localStorage
+            const subscription = checkSubscriptionStatus();
+            if (!subscription.active) {
+                // إذا لم يكن الاشتراك نشطًا، أظهر رسالة أو أعد توجيه المستخدم
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'انتهى الاشتراك أو غير نشط',
+                    text: 'يرجى تفعيل الاشتراك أو التواصل مع الدعم',
+                    confirmButtonColor: '#667eea',
+                    showCancelButton: true,
+                    confirmButtonText: 'صفحة التسجيل',
+                    cancelButtonText: 'إلغاء'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = 'register.html';
+                    }
+                });
+                // منع تحميل باقي النظام
+                return false;
             }
-            
-            const endDate = new Date(localStorage.getItem('subscriptionEnd'));
-            const now = new Date();
-            const daysLeft = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24));
-            
-            if (daysLeft <= 0) {
-                document.getElementById('subscriptionStatus').textContent = 'منتهي';
-                document.getElementById('subscriptionStatus').className = 'font-bold text-red-600';
-                document.getElementById('subscriptionDays').textContent = 'الرجاء تجديد الاشتراك';
-                document.getElementById('subStatus').textContent = 'منتهي';
-                document.getElementById('subStatus').className = 'font-bold text-red-600';
-                
-                alert('انتهى اشتراكك! الرجاء تجديد الاشتراك للاستمرار في استخدام النظام.');
-            } else {
-                document.getElementById('subscriptionStatus').textContent = 'نشط';
-                document.getElementById('subscriptionDays').textContent = daysLeft + ' يوم متبقي';
-                document.getElementById('subStatus').textContent = 'نشط';
-                document.getElementById('expiryDate').textContent = endDate.toLocaleDateString('ar-IQ');
+            // تحديث واجهة الاشتراك
+            document.getElementById('subscriptionStatus').textContent = subscription.status === 'active' ? 'نشط' : 'غير نشط';
+            document.getElementById('subscriptionDays').textContent = subscription.daysLeft + ' يوم متبقي';
+            // تحديث معلومات الاشتراك في صفحة الإعدادات إذا وجدت
+            if (document.getElementById('subStatus')) {
+                document.getElementById('subStatus').textContent = subscription.status === 'active' ? 'نشط' : 'غير نشط';
             }
-        }
-        
-        function activateSubscription() {
-            const code = document.getElementById('subscriptionCode').value;
-            if (!code) {
-                showNotification('الرجاء إدخال رمز الاشتراك', 'error');
-                return;
+            if (document.getElementById('expiryDate')) {
+                document.getElementById('expiryDate').textContent = subscription.end ? new Date(subscription.end).toLocaleDateString('ar-IQ') : '-';
             }
-            
-            // Simple validation (in real app, validate with server)
-            if (code.startsWith('MONTHLY-')) {
-                const newEnd = new Date();
-                newEnd.setMonth(newEnd.getMonth() + 1);
-                localStorage.setItem('subscriptionEnd', newEnd.toISOString());
-                showNotification('تم تفعيل الاشتراك الشهري بنجاح', 'success');
-            } else if (code.startsWith('YEARLY-')) {
-                const newEnd = new Date();
-                newEnd.setFullYear(newEnd.getFullYear() + 1);
-                localStorage.setItem('subscriptionEnd', newEnd.toISOString());
-                showNotification('تم تفعيل الاشتراك السنوي بنجاح', 'success');
-            } else {
-                showNotification('رمز الاشتراك غير صالح', 'error');
-                return;
+            if (document.getElementById('userId')) {
+                document.getElementById('userId').textContent = localStorage.getItem('userId') || 'غير معرف';
             }
-            
-            checkSubscription();
-            document.getElementById('subscriptionCode').value = '';
+            return true;
         }
         
         // Utility Functions
