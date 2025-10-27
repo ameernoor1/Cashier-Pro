@@ -2,16 +2,15 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open('cashier-pro-v1').then(cache => {
       return cache.addAll([
-        '/',
-        '/landing.html',
-        '/register.html',
-        '/index.html',
-        '/admin.html',
-        '/firebase-config.js',
-        '/subscription-manager.js',
-        '/manifest.json',
-        '/icon-192.png',
-        '/icon-512.png'
+        'index.html',
+        'landing.html',
+        'register.html',
+        'admin.html',
+        'firebase-config.js',
+        'subscription-manager.js',
+        'manifest.json',
+        'icon-192.png',
+        'icon-512.png'
       ]);
     })
   );
