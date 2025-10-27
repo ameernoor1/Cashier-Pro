@@ -1,13 +1,13 @@
-// إعدادات Firebase
 const firebaseConfig = {
-    apiKey: "AIzaSyBGP3v4g2Mq8GyIBk3m7lN5dZ8-xYwR1pQ",
-    authDomain: "cashier-system-iraq.firebaseapp.com",
-    databaseURL: "https://cashier-system-iraq-default-rtdb.firebaseio.com",
-    projectId: "cashier-system-iraq",
-    storageBucket: "cashier-system-iraq.appspot.com",
-    messagingSenderId: "123456789012",
-    appId: "1:123456789012:web:abcdef1234567890"
+  apiKey: "AIzaSyB9veHRWl-DZn1o8QWB-iCMrZdzTCVQRaA",
+  authDomain: "data-sayed-hussein-al-saadari.firebaseapp.com",
+  databaseURL: "https://data-sayed-hussein-al-saadari-default-rtdb.firebaseio.com",
+  projectId: "data-sayed-hussein-al-saadari",
+  storageBucket: "data-sayed-hussein-al-saadari.firebasestorage.app",
+  messagingSenderId: "360870345361",
+  appId: "1:360870345361:web:b6098fc1cf33d15b04dd30"
 };
+
 
 // تهيئة Firebase
 if (!firebase.apps.length) {
