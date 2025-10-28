@@ -10,6 +10,7 @@ const ASSETS = [
   './manifest.webmanifest',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png'
+  , './assets/icons/icon-numbers.png'
 ];
 
 self.addEventListener('install', (e) => {

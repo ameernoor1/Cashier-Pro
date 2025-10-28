@@ -234,6 +234,13 @@
 </head>
 
 <body>
+    <!-- زر تثبيت التطبيق (PWA) -->
+    <div id="installPwaContainer" style="display:none; position:fixed; top:20px; left:50%; transform:translateX(-50%); z-index:9999;">
+      <button id="installPwaBtn" class="btn-select" style="padding:0.8rem 2rem; font-size:1.1rem; border-radius:30px; box-shadow:0 2px 10px rgba(102,126,234,0.2);">
+        <i class="fa fa-download"></i> تثبيت التطبيق على جهازك
+      </button>
+    </div>
+
     <!-- Hero Section -->
     <div class="hero-section">
         <div class="logo floating">💰</div>
@@ -718,6 +725,30 @@
     console.log('✅ نظام Cache Buster جاهز - الإصدار:', APP_VERSION);
     
 })();
+    </script>
+
+    <script>
+      // كود عرض زر تثبيت التطبيق
+      let deferredPrompt;
+      const installContainer = document.getElementById('installPwaContainer');
+      const installBtn = document.getElementById('installPwaBtn');
+
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installContainer.style.display = 'block';
+      });
+
+      installBtn.addEventListener('click', async () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          const choiceResult = await deferredPrompt.userChoice;
+          if (choiceResult.outcome === 'accepted') {
+            installContainer.style.display = 'none';
+          }
+          deferredPrompt = null;
+        }
+      });
     </script>
 </body>
 
