@@ -3,17 +3,75 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>كاش برو</title>
+  <title>كاش برو - نظام الكاشير الاحترافي</title>
+  
+  <!-- PWA Manifest -->
   <link rel="manifest" href="manifest.webmanifest">
+  
+  <!-- Theme Color -->
   <meta name="theme-color" content="#667eea">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="كاش برو">
+  
+  <!-- Icons -->
+  <link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="./assets/icons/icon-512.png">
+  <link rel="apple-touch-icon" href="./assets/icons/icon-192.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="./assets/icons/icon-512.png">
+  
+  <!-- Description -->
+  <meta name="description" content="نظام الكاشير الاحترافي الأول في العراق - إدارة ذكية وسريعة لمتجرك">
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Cairo', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .loader {
+      text-align: center;
+      color: white;
+    }
+    
+    .loader-icon {
+      font-size: 4rem;
+      animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+  </style>
+  
   <script>
+    // Register Service Worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js');
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('✅ Service Worker registered'))
+          .catch(err => console.error('❌ Service Worker registration failed:', err));
       });
     }
-    window.location.replace('landing.html');
+    
+    // Redirect to landing page after a short delay
+    setTimeout(() => {
+      window.location.replace('landing.html');
+    }, 500);
   </script>
 </head>
-<body></body>
+<body>
+  <div class="loader">
+    <div class="loader-icon">💰</div>
+    <h2>كاش برو</h2>
+    <p>جاري التحميل...</p>
+  </div>
+</body>
 </html>

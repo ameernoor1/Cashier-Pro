@@ -1,28 +1,70 @@
 {
-  "name": "كاش برو | نظام الكاشير",
+  "name": "كاش برو - نظام الكاشير الاحترافي",
   "short_name": "كاش برو",
-  "lang": "ar",
-  "dir": "rtl",
-  "start_url": "landing.html",
-  "scope": "./",
+  "description": "نظام الكاشير الاحترافي الأول في العراق",
+  "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "background_color": "#667eea",
   "theme_color": "#667eea",
+  "orientation": "any",
+  "dir": "rtl",
+  "lang": "ar",
   "icons": [
     {
-      "src": "assets/icons/icon-192.png",
+      "src": "./assets/icons/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "assets/icons/icon-512.png",
+      "src": "./assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./assets/icons/icon-numbers.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "./assets/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
+    }
+  ],
+  "categories": [
+    "business",
+    "finance",
+    "productivity"
+  ],
+  "shortcuts": [
+    {
+      "name": "نقطة المبيعات",
+      "short_name": "POS",
+      "description": "فتح نقطة المبيعات مباشرة",
+      "url": "/app.html?page=pos",
+      "icons": [
+        {
+          "src": "./assets/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
-      "src": "assets/icons/icon-numbers.png",
-      "sizes": "192x192",
-      "type": "image/png"
+      "name": "إدارة المنتجات",
+      "short_name": "المنتجات",
+      "description": "إدارة المنتجات والمخزن",
+      "url": "/app.html?page=products",
+      "icons": [
+        {
+          "src": "./assets/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }

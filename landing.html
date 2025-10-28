@@ -18,6 +18,24 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.webmanifest">
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="كاش برو">
+
+    <!-- Icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="./assets/icons/icon-512.png">
+    <link rel="apple-touch-icon" href="./assets/icons/icon-192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="./assets/icons/icon-512.png">
+
+    <!-- Description -->
+    <meta name="description" content="نظام الكاشير الاحترافي الأول في العراق - إدارة ذكية وسريعة لمتجرك">
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
 
@@ -453,9 +471,13 @@
                 نظام الكاشير الاحترافي الأول في العراق
             </p>
             <div style="margin-bottom: 2rem;">
-                <i class="fas fa-phone" style="margin-left: 0.5rem;"></i> للدعم: 07XX XXX XXXX
+                <i class="fas fa-phone" style="margin-left: 0.5rem;"></i> للدعم: 07813798636
                 <span style="margin: 0 1rem;">|</span>
-                <i class="fas fa-envelope" style="margin-left: 0.5rem;"></i> info@cashpro.iq
+                <i class="fas fa-envelope" style="margin-left: 0.5rem;"></i> kraaralsebre@gmail.com
+            </div>
+            <div style="margin-bottom: 1.5rem; font-size: 1rem; opacity: 0.8;">
+                إعداد وإدارة التطبيق بالكامل من قبل المبرمج سيد كرار السعبري<br>
+                شركة الابداع الرقمي
             </div>
             <div style="opacity: 0.6; font-size: 0.9rem;">
                 © 2025 كاش برو. جميع الحقوق محفوظة.
@@ -749,6 +771,96 @@
           deferredPrompt = null;
         }
       });
+    </script>
+
+    <!-- سكريبت تثبيت PWA -->
+    <script src="pwa-install.js"></script>
+
+    <!-- سكريبت تسجيل Service Worker -->
+    <script>
+    // تسجيل Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(registration => {
+            console.log('✅ Service Worker registered:', registration.scope);
+            
+            // التحقق من وجود تحديث
+            registration.addEventListener('updatefound', () => {
+              const newWorker = registration.installing;
+              console.log('🔄 Service Worker update found');
+              
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  // يوجد تحديث جديد
+                  console.log('✨ New Service Worker available');
+                  
+                  // إظهار رسالة للمستخدم
+                  if (confirm('يوجد تحديث جديد للتطبيق. هل تريد تحديثه الآن؟')) {
+                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                    window.location.reload();
+                  }
+                }
+              });
+            });
+          })
+          .catch(error => {
+            console.error('❌ Service Worker registration failed:', error);
+          });
+      });
+      
+      // الاستماع لحدث controllerchange
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        console.log('🔄 Service Worker controller changed');
+      });
+    }
+    </script>
+
+    <!-- زر تثبيت يدوي (اختياري - يمكن إضافته في أي مكان في الصفحة) -->
+    <button 
+      onclick="showPWAInstallBanner()" 
+      style="
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 1rem 1.5rem;
+        border-radius: 50px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+        z-index: 9998;
+        font-family: 'Cairo', sans-serif;
+        display: none;
+      "
+      id="manualInstallBtn"
+    >
+      <i class="fas fa-download"></i> تثبيت التطبيق
+    </button>
+
+    <script>
+    // إظهار زر التثبيت اليدوي إذا لم يكن التطبيق مثبتاً
+    window.addEventListener('load', () => {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      
+      // إظهار الزر فقط إذا لم يكن التطبيق مثبتاً
+      if (!isStandalone && !isIOS) {
+        setTimeout(() => {
+          const btn = document.getElementById('manualInstallBtn');
+          if (btn) {
+            btn.style.display = 'block';
+          }
+        }, 5000); // إظهار بعد 5 ثوان
+      }
+    });
+    
+    // دالة لإظهار بانر التثبيت اليدوي (يمكنك تخصيصها)
+    function showPWAInstallBanner() {
+      alert('لتثبيت التطبيق، يرجى الضغط على زر القائمة في المتصفح ثم اختيار "تثبيت التطبيق" أو "Add to Home Screen"');
+    }
     </script>
 </body>
 
