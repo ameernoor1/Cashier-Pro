@@ -1,0 +1,23 @@
+{
+  "name": "كاش برو | نظام الكاشير",
+  "short_name": "كاش برو",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "landing.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#667eea",
+  "icons": [
+    {
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

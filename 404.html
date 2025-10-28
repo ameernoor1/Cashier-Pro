@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>كاش برو</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#667eea">
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js');
+      });
+    }
+    window.location.replace('landing.html');
+  </script>
+</head>
+<body></body>
+</html>
