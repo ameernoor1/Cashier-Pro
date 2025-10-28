@@ -1436,6 +1436,30 @@
                 start: Number(subscriptionData.start) || 0
             };
         }
+
+        // تعريف دالة showPage لتفعيل التنقل بين الصفحات
+        function showPage(pageId) {
+            // إخفاء جميع الصفحات
+            document.querySelectorAll('.page').forEach(function(page) {
+                page.classList.add('hidden');
+            });
+            // إظهار الصفحة المطلوبة
+            var target = document.getElementById(pageId + 'Page');
+            if (target) {
+                target.classList.remove('hidden');
+            }
+            // تحديث الصفحة الحالية
+            currentPage = pageId;
+        }
+
+        // تعريف دالة initSystem إذا لم تكن معرفة
+        if (typeof initSystem !== 'function') {
+            function initSystem() {
+                // يمكنك هنا وضع أي كود تهيئة للنظام
+                // مثال: تحميل بيانات المستخدم أو المنتجات
+                // ...
+            }
+        }
     </script>
 
 
